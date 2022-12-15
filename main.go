@@ -71,11 +71,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	loc, err := time.LoadLocation("Asia/Seoul")
+	if err != nil {
+		panic(err)
+	}
+
 	for {
 		m := &bsm.BSMMessage{}
 
 		(*m).Type = randomGenerator()
-		(*m).TimeStamp = time.Now().UnixNano()
+		(*m).TimeStamp = time.Now().In(loc).UnixMicro()
 		(*m).Level = levelCheck((*m).Type)
 
 		err = conn.WriteJSON(m)
@@ -83,7 +88,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
-		time.Sleep(1000 * time.Microsecond)
+		time.Sleep(500 * time.Microsecond)
 	}
 }
 
